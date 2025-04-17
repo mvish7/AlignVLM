@@ -1,5 +1,7 @@
 from transformers import AutoProcessor, AutoModelForImageTextToText
 from transformers.models.smolvlm import modeling_smolvlm
+from align_connector import ALIGNModule
+from customized_smolvlm_model import CustomSmolVLMModel
 import torch
 import torch.nn as nn
 
@@ -60,17 +62,19 @@ if __name__ == "__main__":
                 },
                 {
                     "type": "text",
-                    "text": "Can you describe this image?"
+                    "text": "Can you describe this image in greater details like game of thrones character of  tywin?"
                 },
             ]
         },
     ]
 
     # ------------------------------------------------------------------------------------------------------------------
-
     model_path = "HuggingFaceTB/SmolVLM2-500M-Video-Instruct"
 
-    modeling_smolvlm.SmolVLMConnector = CustomConnector
+    # modeling_smolvlm.SmolVLMConnector = CustomConnector
+    # modeling_smolvlm.SmolVLMConnector = ALIGNModule
+
+    modeling_smolvlm.SmolVLMModel = CustomSmolVLMModel
 
     processor = AutoProcessor.from_pretrained(model_path)
     model = AutoModelForImageTextToText.from_pretrained(
