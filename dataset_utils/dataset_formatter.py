@@ -29,7 +29,21 @@ TEXTS = [
 ]
 
 
+def get_fields_from_sample(sample):
+    dataset_source = sample.get("texts", None)
+    if isinstance(dataset_source, list):
+        # localized narratives dataset
+        return sample["image_path"], sample["texts"][0]["user"], sample["texts"][0]["assistant"]
+    else:
+        # pixmo dataset
+        return sample["image_path"], random.choice(TEXTS), sample["caption"]
+
+
 def format_data(sample):
+    # fetch info from sample
+    image_path, user_text, assistant_text = get_fields_from_sample(sample)
+
+    # format the message
     return [
         {
             "role": "system",
@@ -40,17 +54,17 @@ def format_data(sample):
             "content": [
                 {
                     "type": "image",
-                    "image": sample["image_path"],
+                    "image": image_path,
                 },
                 {
                     "type": "text",
-                    "text": random.choice(TEXTS)
+                    "text": user_text
                 },
             ],
         },
         {
             "role": "assistant",
-            "content": [{"type": "text", "text": sample["caption"]}],
+            "content": [{"type": "text", "text": assistant_text}],
         },
     ]
 
