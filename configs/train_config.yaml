@@ -7,7 +7,8 @@ model:
 
 # Dataset Configuration
 dataset:
-  path: "/media/vishal/datasets/ln/metadata/"
+  path: "/media/vishal/datasets/ln/metadata/"  # local dir path, to be used with load_from_disk
+  id: ""  # HF dataset_id, to be used with load_dataset
   test_size: 0.1
   seed: 42
 

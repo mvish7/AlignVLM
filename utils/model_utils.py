@@ -6,10 +6,15 @@ from align_vlm.align_connector import ALIGNModule
 from align_vlm.customized_smolvlm_model import CustomSmolVLMModel
 
 
-def init_custom_smolvlm(model_id):
-    modeling_smolvlm.SmolVLMModel = CustomSmolVLMModel
+def init_smolvlm(model_id, use_align_connector=True, is_train=True):
+    if use_align_connector:
+        modeling_smolvlm.SmolVLMModel = CustomSmolVLMModel
 
-    processor = AutoProcessor.from_pretrained(model_id)
+    if is_train:
+        processor = AutoProcessor.from_pretrained(model_id)  # padding_side="left"
+    else:
+        processor = AutoProcessor.from_pretrained(model_id, padding_side="left")
+
     model = AutoModelForImageTextToText.from_pretrained(
         model_id, torch_dtype=torch.bfloat16,
         _attn_implementation="eager").to("cuda")

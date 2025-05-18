@@ -7,8 +7,7 @@ from trl import SFTConfig, SFTTrainer
 from datasets import load_from_disk
 
 from dataset_utils.dataset_formatter import format_data
-from utils.model_utils import (init_custom_smolvlm,
-                                         freeze_for_stage_2_training)
+from utils.model_utils import init_smolvlm, freeze_for_stage_2_training
 
 
 def create_lora_config(config: Dict[str, Any]) -> LoraConfig:
@@ -102,7 +101,7 @@ def prepare_datasets(config: Dict[str, Any]) -> tuple:
 def train_model(config: Dict[str, Any]) -> None:
     """Main training function."""
     # Initialize model and processor
-    model, processor = init_custom_smolvlm(config['model']['model_id'])
+    model, processor = init_smolvlm(config['model']['model_id'], use_align_connector=True)
     model = freeze_for_stage_2_training(model)
 
     image_token_id = processor.tokenizer.additional_special_tokens_ids[

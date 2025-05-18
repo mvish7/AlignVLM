@@ -8,7 +8,7 @@ from transformers.utils import logging, add_start_docstrings_to_model_forward
 from transformers.models.smolvlm.modeling_smolvlm import SmolVLMPreTrainedModel, SmolVLMVisionTransformer, \
     SmolVLMConnector,SmolVLMConfig, SMOLVLM_INPUTS_DOCSTRING, SmolVLMBaseModelOutputWithPast
 
-from align_connector import ALIGNModule
+from align_vlm.align_connector import ALIGNModule
 
 
 logger = logging.get_logger(__name__)

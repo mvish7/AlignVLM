@@ -29,20 +29,41 @@ TEXTS = [
 ]
 
 
-def get_fields_from_sample(sample):
-    dataset_source = sample.get("texts", None)
-    if isinstance(dataset_source, list):
-        # localized narratives dataset
-        return sample["image_path"], sample["texts"][0]["user"], sample["texts"][0]["assistant"]
+def get_fields_from_sample(sample, test_set=False):
+    if test_set:
+        question = ("Please generate an accurate caption using 10-15 words. Just focus on main object and key features"
+                    " in the image.")
+        return sample["image"], question, sample["answer"]
     else:
-        # pixmo dataset
-        return sample["image_path"], random.choice(TEXTS), sample["caption"]
+        dataset_source = sample.get("texts", None)
+        if isinstance(dataset_source, list):
+            # localized narratives dataset
+            return sample["image_path"], sample["texts"][0]["user"], sample["texts"][0]["assistant"]
+        else:
+            # pixmo dataset
+            return sample["image_path"], random.choice(TEXTS), sample["caption"]
 
 
-def format_data(sample):
+def get_content(img_path, usr_text, few_shot_ex=None):
+
+    cur_img_content =  [{"type": "image", "image": img_path}, {"type": "text","text": usr_text},]
+    if few_shot_ex:
+        few_shot_content =  [{"type": "image", "image": few_shot_ex[0]['image']},
+                {"type": "text",
+                 "text": f"I'll show you few examples of image-caption pairs. here is the first example caption - {few_shot_ex[0]['answer'][0]}"},
+                {"type": "image", "image": few_shot_ex[0]['image']},
+                {"type": "text",
+                 "text": f"I'll show you few examples of image-caption pairs. here is the second example caption -  {few_shot_ex[1]['answer'][1]}"}
+        ]
+        return few_shot_content + cur_img_content
+    else:
+        return cur_img_content
+
+
+def format_data(sample, few_shot_ex=None, test_set=False):
     # fetch info from sample
-    image_path, user_text, assistant_text = get_fields_from_sample(sample)
-
+    image_path, user_text, assistant_text = get_fields_from_sample(sample, test_set)
+    content_list = get_content(image_path, user_text, few_shot_ex)
     # format the message
     return [
         {
@@ -51,16 +72,7 @@ def format_data(sample):
         },
         {
             "role": "user",
-            "content": [
-                {
-                    "type": "image",
-                    "image": image_path,
-                },
-                {
-                    "type": "text",
-                    "text": user_text
-                },
-            ],
+            "content": content_list,
         },
         {
             "role": "assistant",
@@ -82,10 +94,10 @@ def gather_images_from_message(messages: list[dict]) -> list[Image.Image]:
         for element in content:
             if isinstance(element, dict) and element.get("type") == "image":
                 # Get the image and convert to RGB
-                if "image" in element:
+                if "image" in element and isinstance(element["image"], str):
                     image = element["image"]
                     image = Image.open(image)
                 else:
-                    image = element
+                    image = element["image"]
                 image_inputs.append(image.convert("RGB"))
     return image_inputs
