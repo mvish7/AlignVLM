@@ -1,35 +1,17 @@
-from PIL import Image
+from core.utils.process_sample import prep_sample_for_generation
 
-
-def generate_text_from_sample(model, processor, sample, max_new_tokens=1024, device="cuda"):
+def generate_text_from_sample(model, processor, sample, processed_sample=False, max_new_tokens=512, device="cuda"):
     """
     infer the model to generate text from image-text input
     """
-    # Prepare the text input by applying the chat template
-    text_input = processor.apply_chat_template(
-        sample[1:2], add_generation_prompt=True  # Use the sample without the system message
-    )
-
-    image_inputs = []
-    image_path = sample[1]["content"][0]["image"]
-    image = Image.open(image_path)
-    if image.mode != "RGB":
-        image = image.convert("RGB")
-    image_inputs.append([image])
-
-    # Prepare the inputs for the model
-    model_inputs = processor(
-        # text=[text_input],
-        text=text_input,
-        images=image_inputs,
-        return_tensors="pt",
-    ).to(device).to(model.dtype)  # Move inputs to the specified device
+    if not processed_sample:
+        sample = prep_sample_for_generation(processor, sample, device, model.dtype)
 
     # Generate text with the model
-    generated_ids = model.generate(**model_inputs, max_new_tokens=max_new_tokens, do_sample=True, temparature=0.7)
+    generated_ids = model.generate(**sample.to(model.dtype), max_new_tokens=max_new_tokens, do_sample=True)
 
     # Trim the generated ids to remove the input ids
-    trimmed_generated_ids = [out_ids[len(in_ids) :] for in_ids, out_ids in zip(model_inputs.input_ids, generated_ids)]
+    trimmed_generated_ids = [out_ids[len(in_ids) :] for in_ids, out_ids in zip(sample.input_ids, generated_ids)]
 
     # Decode the output text
     output_text = processor.batch_decode(

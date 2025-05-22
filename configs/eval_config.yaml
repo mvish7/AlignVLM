@@ -1,49 +1,23 @@
 # Model Configuration
 model:
   model_id: "HuggingFaceTB/SmolVLM2-500M-Video-Instruct"
-  lora_adapter_path: "/media/vishal/workspace/projects/gemma3_4b/align_vlm/checkpoints/pixmo_100k"
+  lora_adapter_path: "" # "/media/vishal/workspace/projects/AlignVLM/checkpoints/localized_narratives_200k/checkpoint-5200"
+  use_align_connector: false
+  is_train: false
 
 # Dataset Configuration
 dataset:
   path: ""
   id: "lmms-lab/COCO-Caption"
+  cache_dir: "/media/vishal/datasets/hf_cache/"
+  few_shot:
+    enabled: false
+    num_examples: 2
 
+# Evaluation Configuration
 eval:
   metric: "Cider score"
-
-# LoRA Configuration
-#lora:
-#  lora_alpha: 64
-#  lora_dropout: 0.1
-#  r: 64
-#  use_rslora: true
-#  bias: "none"
-#  task_type: "CAUSAL_LM"
-#
-## Training Configuration
-#training:
-#  output_dir: "/media/vishal/workspace/projects/gemma3_4b/align_vlm/checkpoints/localized_narratives_200k"
-#  num_train_epochs: 1
-#  optim: "adamw_torch_fused"
-#  logging_steps: 200
-#  save_strategy: "steps"
-#  save_steps: 2600
-#  learning_rate: 1e-4
-#  bf16: true
-#  report_to: "tensorboard"
-#  eval_strategy: "epoch"
-#  eval_accumulation_steps: 5
-#  warmup_steps: 70
-#  per_device_train_batch_size: 4
-#  per_device_eval_batch_size: 4
-#  gradient_accumulation_steps: 8
-#  gradient_checkpointing: true
-#  gradient_checkpointing_kwargs:
-#    use_reentrant: false
-#  weight_decay: 0.01
-#  use_cpu: false
-#  dataloader_num_workers: 6
-#  dataloader_pin_memory: true
-#  torch_empty_cache_steps: 20
-#  dataset_kwargs:
-#    skip_prepare_dataset: true
+  batch_size: 4
+  num_workers: 4
+  pin_memory: true
+  cider_tokenizer_path: "/media/vishal/workspace/projects/AlignVLM"
