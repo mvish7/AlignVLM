@@ -36,6 +36,10 @@ and I have trained AlignVLM module only for 300k images, we can get an indicatio
 * If ALIGN module is used connector in a VLM and trained on large scale data, it has potential to be a viable connector.
 * If a VLM is trained with ALIGN module as connector from scratch then it might surpass the performance of VLMs with other connector modules
 
+Here is a visualization of the results:
+
+![results](resources/results.png)
+
 ---
 
 # Training on image captioning datasets:
