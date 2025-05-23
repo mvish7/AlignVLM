@@ -7,3 +7,4 @@ accelerate
 pillow~=11.1.0
 datasets~=3.3.2
 requests~=2.32.3
+evaluate
